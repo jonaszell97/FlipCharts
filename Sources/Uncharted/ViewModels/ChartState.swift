@@ -146,6 +146,10 @@ internal class ChartState: ObservableObject {
         let step = firstSubset.computedParameters.yAxisParams.stepSize
         
         var current = fullData.computedParameters.yAxisParams.lowerBound
+        guard step > 0 else {
+            return fullData.config.yAxisConfig.labelFormatter(current)
+        }
+        
         let end = fullData.computedParameters.yAxisParams.upperBound
         
         var longestLabelCount = 0
