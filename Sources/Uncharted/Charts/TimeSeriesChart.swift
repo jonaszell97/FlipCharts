@@ -52,6 +52,7 @@ extension TimeSeriesScope {
             currentDate = Calendar.reference.date(byAdding: step, to: currentDate)!
         }
         
+        dates.append(currentDate)
         return dates
     }
     
@@ -234,12 +235,21 @@ public struct TimeSeriesView<ChartContent: View>: View {
         let interval = source.interval
         let dates = resolution.dates(in: interval)
         
+        let xValueOffset: Double
+        switch resolution {
+        case .day:
+            fallthrough
+        case .month:
+            xValueOffset = 0
+        default:
+            xValueOffset = 0.5
+        }
+        
         let visibleInterval = DateInterval(start: dates.first!, end: dates.last!)
-        let values = dates
-            .enumerated()
-            .map { ($0.offset, source.value(on: $0.element)) }
+        let values = (0..<(dates.count-1))
+            .map { ($0, source.averageValue(in: DateInterval(start: dates[$0], end: dates[$0+1]))) }
             .filter { $0.1 != nil }
-            .map { DataPoint(x: Double($0.0) + 0.5, y: $0.1!) }
+            .map { DataPoint(x: Double($0.0) + xValueOffset, y: $0.1!) }
         
         let configure = { (config: ChartConfig) -> ChartConfig in
             config.xAxisConfig.baseline = .zero
