@@ -86,7 +86,7 @@ fileprivate struct BarChartViewImpl: View {
             ydistance = 1
         }
         
-        let relativeYs = values.map { ($0.1 - yBounds.min) / ydistance }
+        let relativeYs = values.map { min(1, ($0.1 - yBounds.min) / ydistance) }
         let totalRelativeY = relativeYs.reduce(0) { $0 + $1 }
         
         let highlighted = state.highlightedDataPoints.isEmpty || values.first { part in
@@ -138,7 +138,7 @@ fileprivate struct BarChartViewImpl: View {
                 VStack(spacing: 0) {
                     Rectangle()
                         .fill(Color.clear)
-                        .frame(width: barWidth, height: size.height - barHeight)
+                        .frame(width: barWidth, height: max(0, size.height - barHeight))
                     Rectangle()
                         .fill(LinearGradient(stops: positiveStops, startPoint: .bottom, endPoint: .top))
                         .frame(width: barWidth, height: barHeight)
@@ -167,7 +167,7 @@ fileprivate struct BarChartViewImpl: View {
                     
                     Rectangle()
                         .fill(Color.clear)
-                        .frame(width: barWidth, height: size.height - barHeight)
+                        .frame(width: barWidth, height: max(0, size.height - barHeight))
                 }
                 .contentShape(Rectangle())
                 .onTapGesture {
@@ -211,7 +211,7 @@ fileprivate struct BarChartViewImpl: View {
                     VStack(spacing: 0) {
                         Rectangle()
                             .fill(Color.clear)
-                            .frame(width: barWidth, height: size.height - barHeight)
+                            .frame(width: barWidth, height: max(0, size.height - barHeight))
                         Rectangle()
                             .fill(color.swiftUIShapeStyle)
                             .frame(width: barWidth, height: barHeight)
@@ -244,7 +244,7 @@ fileprivate struct BarChartViewImpl: View {
                             .opacity(highlighted ? 1 : 0.50)
                         Rectangle()
                             .fill(Color.clear)
-                            .frame(width: barWidth, height: size.height - barHeight)
+                            .frame(width: barWidth, height: max(0, size.height - barHeight))
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
