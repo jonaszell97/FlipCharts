@@ -54,7 +54,7 @@ fileprivate struct BarChartViewImpl: View {
         let availableWidth = size.width
         let barCount = CGFloat(data.computedParameters.sortedXValues.count)
     
-        var minimumSpacing: CGFloat = 10
+        var minimumSpacing: CGFloat = (availableWidth / barCount) * 0.1
         while ((barCount - 1) * minimumSpacing) >= availableWidth {
             minimumSpacing /= 2
         }
