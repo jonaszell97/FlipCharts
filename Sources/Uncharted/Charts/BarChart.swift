@@ -132,7 +132,7 @@ fileprivate struct BarChartViewImpl: View {
         return ZStack {
             // Positive values
             if positiveSpacePercentage > 0 {
-                let barHeight = positiveTotalY * size.height * positiveSpacePercentage
+                let barHeight = positiveTotalY * size.height * positiveSpacePercentage * CGFloat(state.appearanceAnimationProgress)
                 let xOffset = relativeX * size.width - size.width * 0.5 + horizontalOffset
                 
                 VStack(spacing: 0) {
@@ -155,7 +155,7 @@ fileprivate struct BarChartViewImpl: View {
             
             // Negative values
             if negativeSpacePercentage > 0 {
-                let barHeight = negativeTotalY * size.height * negativeSpacePercentage
+                let barHeight = negativeTotalY * size.height * negativeSpacePercentage * CGFloat(state.appearanceAnimationProgress)
                 let xOffset = relativeX * size.width - size.width * 0.5 + horizontalOffset
                 
                 VStack(spacing: 0) {
@@ -205,7 +205,7 @@ fileprivate struct BarChartViewImpl: View {
                 ForEach(0..<positiveRelativeYs.count, id: \.self) { i in
                     let relativeY: Double = positiveRelativeYs[i]
                     let color: ColorStyle = positiveValues[i].2
-                    let barHeight = relativeY * size.height * positiveSpacePercentage
+                    let barHeight = relativeY * size.height * positiveSpacePercentage * CGFloat(state.appearanceAnimationProgress)
                     let xOffset = relativeX * size.width - size.width * 0.5 + horizontalOffset
                     
                     VStack(spacing: 0) {
@@ -233,7 +233,7 @@ fileprivate struct BarChartViewImpl: View {
                 ForEach(0..<negativeRelativeYs.count, id: \.self) { i in
                     let relativeY: Double = negativeRelativeYs[i]
                     let color: ColorStyle = negativeValues[i].2
-                    let barHeight = relativeY * size.height * negativeSpacePercentage
+                    let barHeight = relativeY * size.height * negativeSpacePercentage * CGFloat(state.appearanceAnimationProgress)
                     let xOffset = relativeX * size.width - size.width * 0.5 + horizontalOffset
                     
                     VStack(spacing: 0) {

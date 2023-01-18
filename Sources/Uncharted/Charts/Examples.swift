@@ -4,7 +4,7 @@
 import SwiftUI
 import Toolbox
 
-struct BarChartPreviews {
+struct BarChartPreviews: PreviewProvider {
     static let seed: UInt64 = 1234
     internal static func createExampleData() -> ChartData {
         let data: ChartData = .init(
@@ -95,7 +95,7 @@ struct RandomizableChart_Previews {
     }
 }
 
-struct TimeSeriesPreviews: PreviewProvider {
+struct TimeSeriesPreviews {
     struct PreviewView: View {
         static let dateFormatter: Foundation.DateFormatter = {
             let dateFormatter = Foundation.DateFormatter()
