@@ -95,7 +95,7 @@ struct RandomizableChart_Previews {
     }
 }
 
-struct TimeSeriesPreviews {
+struct TimeSeriesPreviews: PreviewProvider {
     struct PreviewView: View {
         static let dateFormatter: Foundation.DateFormatter = {
             let dateFormatter = Foundation.DateFormatter()
@@ -132,6 +132,7 @@ struct TimeSeriesPreviews {
         }
         
         @State var chartState: ChartStateProxy? = nil
+        @State var segmentIndex: Int = 0
         
         let source = InterpolatingTimeSeriesDataSource(data: Self.fullData)
         var body: some View {
@@ -151,22 +152,27 @@ struct TimeSeriesPreviews {
                 ])
                 
                 VStack {
-//                    if let chartState {
-                        HStack {
-                            Text(verbatim: currentScope.formatTimeInterval(timeSeriesData.interval))
-                                .foregroundColor(.primary.opacity(0.50))
-                            Spacer()
-                        }
-                        .padding(.trailing)
-//                    }
+                    HStack {
+                        Text(verbatim: currentScope.formatTimeInterval(timeSeriesData.interval, segmentIndex: self.segmentIndex))
+                            .foregroundColor(.primary.opacity(0.50))
+                        Spacer()
+                    }
+                    .padding(.trailing)
                     
-                    LineChart(data: chartData, chartState: $chartState)
-                        .frame(height: 300)
                     
-                    TimeSeriesDefaultIntervalPickerView(currentScope: $currentScope)
-                        .padding()
+                    VStack {
+                        LineChart(data: chartData, chartState: $chartState)
+                            .frame(height: 300)
+                        
+                        TimeSeriesDefaultIntervalPickerView(currentScope: $currentScope)
+                            .padding()
+                    }
+                    .id(chartData.dataHash)
                 }
                 .padding()
+                .observeChart { proxy in
+                    self.segmentIndex = proxy.currentSegmentIndex
+                }
             }
         }
     }

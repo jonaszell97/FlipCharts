@@ -11,14 +11,36 @@ public struct ChartStateProxy {
     public var completeData: ChartData { state.fullData }
     
     /// The currently visible data segment.
-    public var currentSegmentData: ChartData { state.currentDataSubset }
+    public var currentSegmentData: ChartData
     
     /// The index of the currently visible data subset.
-    public var currentSegmentIndex: Int { state.currentSubsetIndex }
+    public var currentSegmentIndex: Int
     
     /// Internal initializer.
     internal init(state: ChartState) {
         self.state = state
+        self.currentSegmentData = state.currentDataSubset
+        self.currentSegmentIndex = state.currentSubsetIndex
+    }
+}
+
+public struct ChartStateReader<Content: View>: View {
+    /// The content view.
+    let content: (ChartStateProxy?) -> Content
+    
+    /// The chart state.
+    @State var chartStateProxy: ChartStateProxy? = nil
+    
+    /// Memberwise initializer.
+    public init(content: @escaping (ChartStateProxy?) -> Content) {
+        self.content = content
+    }
+    
+    public var body: some View {
+        content(chartStateProxy)
+            .onPreferenceChange(ChartStateProxyKey.self) { chartStateProxy in
+                self.chartStateProxy = chartStateProxy
+            }
     }
 }
 
@@ -416,5 +438,40 @@ internal class ChartState: ObservableObject {
                 callback(series, pt)
             }
         }
+    }
+}
+
+// MARK: ChartState Observation
+
+internal struct ChartStateProxyKey: PreferenceKey {
+    typealias Value = ChartStateProxy?
+    static var defaultValue: ChartStateProxy? = nil
+    
+    static func reduce(value: inout ChartStateProxy?, nextValue: () -> ChartStateProxy?) {
+        let nextValue = nextValue()
+        guard nextValue != nil else { return }
+        value = nextValue
+    }
+}
+
+public extension View {
+    /// Observe changes to the state of chart subviews.
+    func observeChart(_ callback: @escaping (ChartStateProxy) -> Void) -> some View {
+        self.onPreferenceChange(ChartStateProxyKey.self) { proxy in
+            guard let proxy else { return }
+            callback(proxy)
+        }
+    }
+}
+
+extension ChartStateProxy: Hashable {
+    public static func ==(lhs: ChartStateProxy, rhs: ChartStateProxy) -> Bool {
+        ObjectIdentifier(lhs.state) == ObjectIdentifier(rhs.state)
+            && lhs.currentSegmentIndex == rhs.currentSegmentIndex
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(self.state))
+        hasher.combine(self.currentSegmentIndex)
     }
 }

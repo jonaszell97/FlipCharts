@@ -459,7 +459,8 @@ public struct ChartBase<Content: View>: View {
     }
     
     public var body: some View {
-        ZStack {
+        print("ChartBase.body \(state.currentDataSubset.series.first?.data.count)")
+        return ZStack {
             if state.initialized, let yAxisParams = state.yAxisParams {
                 self.chartBody(yAxisParams: yAxisParams)
             }
@@ -468,6 +469,7 @@ public struct ChartBase<Content: View>: View {
         .onAppear {
             state.initialize(data: fullData)
         }
+        .transformPreference(ChartStateProxyKey.self) { $0 = ChartStateProxy(state: state) }
         .id(ObjectIdentifier(fullData))
     }
 }

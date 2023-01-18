@@ -57,7 +57,38 @@ extension TimeSeriesScope {
     }
     
     /// - returns: A string representing the selected interval in the given locale.
-    public func formatTimeInterval(_ interval: DateInterval, locale: Locale? = nil) -> String {
+    public func formatTimeInterval(_ interval: DateInterval, segmentIndex: Int = 0, locale: Locale? = nil) -> String {
+        var interval = interval
+        if segmentIndex > 0 {
+            let offset: DateComponents
+            let length: DateComponents
+            switch self {
+            case .day:
+                offset = .init(hour: 24 * segmentIndex)
+                length = .init(hour: 24)
+            case .week:
+                offset = .init(day: 7 * segmentIndex)
+                length = .init(day: 7 * segmentIndex)
+            case .month:
+                offset = .init(month: 1 * segmentIndex)
+                length = .init(month: 1)
+            case .threeMonths:
+                offset = .init(month: 3 * segmentIndex)
+                length = .init(month: 3)
+            case .sixMonths:
+                offset = .init(month: 6 * segmentIndex)
+                length = .init(month: 6)
+            case .year:
+                offset = .init(year: 1 * segmentIndex)
+                length = .init(year: 1)
+            }
+            
+            let firstDate = Calendar.reference.date(byAdding: offset, to: interval.start)!
+            let lastDate = Calendar.reference.date(byAdding: length, to: firstDate)!
+            
+            interval = DateInterval(start: firstDate, end: lastDate)
+        }
+        
         switch self {
         case .day:
             return FormatToolbox.formatDate(interval.start)
@@ -191,8 +222,10 @@ public struct TimeSeriesData {
     let hashValue: Int
     
     /// Memberwise initializer.
-    internal init(scope: TimeSeriesScope, interval: DateInterval,
-                  dates: [Date], values: [DataPoint],
+    internal init(scope: TimeSeriesScope,
+                  interval: DateInterval,
+                  dates: [Date],
+                  values: [DataPoint],
                   configure: @escaping (ChartConfig) -> ChartConfig) {
         self.scope = scope
         self.interval = interval
@@ -215,11 +248,14 @@ public struct TimeSeriesView<ChartContent: View>: View {
     /// The chart builder.
     let buildChartView: (TimeSeriesData) -> ChartContent
     
+    /// The current scope.
+    @Binding var scope: TimeSeriesScope
+    
     /// The time series data.
     @State var data: TimeSeriesData? = nil
     
-    /// The current scope.
-    @Binding var scope: TimeSeriesScope
+    /// The chart state.
+    @State var chartState: ChartStateProxy? = nil
     
     /// Default initializer.
     public init(source: TimeSeriesDataSource,
@@ -245,7 +281,7 @@ public struct TimeSeriesView<ChartContent: View>: View {
             xValueOffset = 0.5
         }
         
-        let visibleInterval = DateInterval(start: dates.first!, end: dates.last!)
+        let valueInterval = DateInterval(start: dates.first!, end: dates.last!)
         let values = (0..<(dates.count-1))
             .map { ($0, source.averageValue(in: DateInterval(start: dates[$0], end: dates[$0+1]))) }
             .filter { $0.1 != nil }
@@ -290,8 +326,8 @@ public struct TimeSeriesView<ChartContent: View>: View {
             return config
         }
         
-        return TimeSeriesData(scope: resolution, interval: visibleInterval, dates: dates,
-                              values: values, configure: configure)
+        return TimeSeriesData(scope: resolution, interval: valueInterval,
+                              dates: dates, values: values, configure: configure)
     }
     
     public var body: some View {

@@ -271,7 +271,7 @@ fileprivate struct BarChartViewImpl: View {
 }
 
 @available(iOS 15, macOS 12, tvOS 15, watchOS 8, *)
-internal struct BarChart15: View {
+internal struct BarChart15: View, Equatable {
     /// The chart state.
     @ObservedObject var state: ChartState
     
@@ -292,6 +292,10 @@ internal struct BarChart15: View {
     
     /// The percentage of vertical space taken up by negative values.
     let negativeSpacePercentage: CGFloat
+    
+    static func == (lhs: BarChart15, rhs: BarChart15) -> Bool {
+        lhs.data.dataHash == rhs.data.dataHash
+    }
     
     init(state: ChartState, data: ChartData, size: CGSize) {
         self.state = state
@@ -356,6 +360,7 @@ internal struct BarChart15: View {
     }
     
     var body: some View {
+        print("BarChart15.body \(data.series.first?.data.count)")
         let xValues = data.computedParameters.sortedXValues
         return ZStack {
             ForEach(0..<xValues.count, id: \.self) { i in
@@ -381,8 +386,9 @@ public struct BarChart: View {
     }
     
     public var body: some View {
-        ChartBase(data: data) { state, currentData, size in
-            BarChart15(state: state, data: currentData, size: size)
+        print("BarChart.body")
+        return ChartBase(data: data) { state, currentData, size in
+            BarChart15(state: state, data: currentData, size: size).equatable()
         }
     }
 }
