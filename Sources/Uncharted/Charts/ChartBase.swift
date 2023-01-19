@@ -84,7 +84,7 @@ public struct ChartBase<Content: View>: View {
         let gridStyle = axisConfig.gridStyle
         let xAxisParams = data.computedParameters.xAxisParams
         
-        let labelCount = data.isEmpty ? 3 : xAxisParams.labels.count - 1
+        let labelCount = xAxisParams.labels.isEmpty ? 3 : xAxisParams.labels.count - 1
         let spacePerLabel = size.width / CGFloat(labelCount)
         
         return HStack(spacing: 0) {
@@ -455,8 +455,7 @@ public struct ChartBase<Content: View>: View {
     }
     
     public var body: some View {
-        print("ChartBase.body \((state.currentDataSubset.series.first?.data.count).debugDescription)")
-        return ZStack {
+        ZStack {
             if state.initialized, let yAxisParams = state.yAxisParams {
                 self.chartBody(yAxisParams: yAxisParams)
             }
