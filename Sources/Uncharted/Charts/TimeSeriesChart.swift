@@ -98,9 +98,15 @@ extension TimeSeriesScope {
             let components = Calendar.reference.dateComponents([.month,.year], from: interval.start)
             return "\(longMonthFormat(month: components.month!, languageCode: locale?.languageCode)) \(components.year!)"
         case .threeMonths:
-            fallthrough
+            let components = Calendar.reference.dateComponents([.month,.year], from: interval.start)
+            let quarter: Int = Int((Double(components.month!) / 3).rounded(.awayFromZero))
+            
+            return "Q\(quarter) \(components.year!)"
         case .sixMonths:
-            fallthrough
+            let components = Calendar.reference.dateComponents([.month,.year], from: interval.start)
+            let half: Int = Int((Double(components.month!) / 6).rounded(.awayFromZero))
+            
+            return "H\(half) \(components.year!)"
         case .year:
             let year = Calendar.reference.component(.year, from: interval.start)
             return "\(year)"

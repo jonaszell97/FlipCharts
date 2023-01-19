@@ -4,7 +4,7 @@
 import SwiftUI
 import Toolbox
 
-struct BarChartPreviews: PreviewProvider {
+struct BarChartPreviews {
     static let seed: UInt64 = 1234
     internal static func createExampleData() -> ChartData {
         let data: ChartData = .init(
@@ -159,15 +159,12 @@ struct TimeSeriesPreviews: PreviewProvider {
                     }
                     .padding(.trailing)
                     
+                    LineChart(data: chartData)
+                        .frame(height: 300)
+                        .id(chartData.dataHash)
                     
-                    VStack {
-                        LineChart(data: chartData, chartState: $chartState)
-                            .frame(height: 300)
-                        
-                        TimeSeriesDefaultIntervalPickerView(currentScope: $currentScope)
-                            .padding()
-                    }
-                    .id(chartData.dataHash)
+                    TimeSeriesDefaultIntervalPickerView(currentScope: $currentScope)
+                        .padding()
                 }
                 .padding()
                 .observeChart { proxy in

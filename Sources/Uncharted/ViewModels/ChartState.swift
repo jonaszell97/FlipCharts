@@ -44,7 +44,57 @@ public struct ChartStateReader<Content: View>: View {
     }
 }
 
+/// Properties of the chart state that are relevant to child views.
+internal class ObservedChartState: ObservableObject {
+    /// The base state.
+    var state: ChartState? = nil
+    
+    /// The animation progress percentage.
+    @Published var appearanceAnimationProgress: Double = 0
+    
+    /// The x-value of the highlighted data point, if any.
+    @Published var highlightedDataPoints: [(String, DataPoint)] = []
+    
+    /// Execute the tap actions for a given data point.
+    internal func runTapActions(for pt: DataPoint, in seriesName: String) {
+        guard let state else {
+            return
+        }
+        
+        guard let series = (state.currentDataSubset.series.first { $0.name == seriesName }) else {
+            fatalError("series \(seriesName) does not exist")
+        }
+        
+        for action in state.fullData.config.tapActions {
+            switch action {
+            case .highlightSingle:
+                if highlightedDataPoints.isEmpty {
+                    highlightedDataPoints.append((seriesName, pt))
+                }
+                else if highlightedDataPoints[0].0 == seriesName && highlightedDataPoints[0].1 == pt {
+                    highlightedDataPoints = []
+                }
+                else {
+                    highlightedDataPoints = [(seriesName, pt)]
+                }
+            case .highlightMultiple:
+                if (highlightedDataPoints.contains { $0.0 == seriesName && $0.1 == pt }) {
+                    highlightedDataPoints.removeAll { $0.0 == seriesName && $0.1 == pt }
+                }
+                else {
+                    highlightedDataPoints.append((seriesName, pt))
+                }
+            case .custom(let callback):
+                callback(series, pt)
+            }
+        }
+    }
+}
+
 internal class ChartState: ObservableObject {
+    /// The  chart state passed to subviews.
+    let observedState: ObservedChartState
+    
     /// The full data set of this chart.
     var fullData: ChartData
     
@@ -74,12 +124,6 @@ internal class ChartState: ObservableObject {
     
     /// The calculated size of the chart content and x-axis area.
     @Published var chartAreaSize: CGSize = .zero
-    
-    /// The animation progress percentage.
-    @Published var appearanceAnimationProgress: Double = 0
-    
-    /// The x-value of the highlighted data point, if any.
-    @Published var highlightedDataPoints: [(String, DataPoint)] = []
     
     /// Cached data subsets.
     var dataSubsets: [Int: ChartData]
@@ -121,6 +165,9 @@ internal class ChartState: ObservableObject {
         self.previousDataSubset = .empty
         self.currentChartOffset = .zero
         self.yAxisParams = nil
+        self.observedState = .init()
+        
+        self.observedState.state = self
     }
     
     /// Assign data to this state.
@@ -406,37 +453,6 @@ internal class ChartState: ObservableObject {
             self.previousDataSubset = self.getSubset(for: newIndex - 1, cacheResult: false, copyYAxisFrom: subset.computedParameters)
             self.currentDataSubset = subset
             self.nextDataSubset = self.getSubset(for: newIndex + 1, cacheResult: false, copyYAxisFrom: subset.computedParameters)
-        }
-    }
-    
-    /// Execute the tap actions for a given data point.
-    internal func runTapActions(for pt: DataPoint, in seriesName: String) {
-        guard let series = (self.currentDataSubset.series.first { $0.name == seriesName }) else {
-            fatalError("series \(seriesName) does not exist")
-        }
-        
-        for action in fullData.config.tapActions {
-            switch action {
-            case .highlightSingle:
-                if highlightedDataPoints.isEmpty {
-                    highlightedDataPoints.append((seriesName, pt))
-                }
-                else if highlightedDataPoints[0].0 == seriesName && highlightedDataPoints[0].1 == pt {
-                    highlightedDataPoints = []
-                }
-                else {
-                    highlightedDataPoints = [(seriesName, pt)]
-                }
-            case .highlightMultiple:
-                if (highlightedDataPoints.contains { $0.0 == seriesName && $0.1 == pt }) {
-                    highlightedDataPoints.removeAll { $0.0 == seriesName && $0.1 == pt }
-                }
-                else {
-                    highlightedDataPoints.append((seriesName, pt))
-                }
-            case .custom(let callback):
-                callback(series, pt)
-            }
         }
     }
 }

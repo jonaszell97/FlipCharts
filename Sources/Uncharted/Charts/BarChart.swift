@@ -9,7 +9,7 @@ fileprivate struct BarChartViewImpl: View {
     let data: ChartData
     
     /// The chart state.
-    @ObservedObject var state: ChartState
+    @ObservedObject var state: ObservedChartState
     
     /// Whether or not to stack the data.
     let isStacked: Bool
@@ -271,9 +271,9 @@ fileprivate struct BarChartViewImpl: View {
 }
 
 @available(iOS 15, macOS 12, tvOS 15, watchOS 8, *)
-internal struct BarChart15: View, Equatable {
+internal struct BarChart15: View {
     /// The chart state.
-    @ObservedObject var state: ChartState
+    @ObservedObject var state: ObservedChartState
     
     /// The data to use for this chart.
     let data: ChartData
@@ -297,7 +297,7 @@ internal struct BarChart15: View, Equatable {
         lhs.data.dataHash == rhs.data.dataHash
     }
     
-    init(state: ChartState, data: ChartData, size: CGSize) {
+    init(state: ObservedChartState, data: ChartData, size: CGSize) {
         self.state = state
         self.data = data
         self.size = size
@@ -360,7 +360,6 @@ internal struct BarChart15: View, Equatable {
     }
     
     var body: some View {
-        print("BarChart15.body \(data.series.first?.data.count)")
         let xValues = data.computedParameters.sortedXValues
         return ZStack {
             ForEach(0..<xValues.count, id: \.self) { i in
@@ -371,9 +370,17 @@ internal struct BarChart15: View, Equatable {
     }
 }
 
-public struct BarChart: View {
+public struct BarChart: View, Equatable {
     /// The data to use for this chart.
     let data: ChartData
+    
+    /// The chart state.
+    @StateObject var state: ChartState = .init()
+    
+    /// Avoid unnecessary view updates.
+    public static func ==(lhs: BarChart, rhs: BarChart) -> Bool {
+        lhs.data.dataHash == rhs.data.dataHash
+    }
     
     /// Default initializer
     public init(data: ChartData) {
@@ -386,9 +393,8 @@ public struct BarChart: View {
     }
     
     public var body: some View {
-        print("BarChart.body")
-        return ChartBase(data: data) { state, currentData, size in
-            BarChart15(state: state, data: currentData, size: size).equatable()
+        ChartBase(state: state, data: data) { state, currentData, size in
+            BarChart15(state: state, data: currentData, size: size)
         }
     }
 }
