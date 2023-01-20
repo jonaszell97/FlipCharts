@@ -134,7 +134,7 @@ struct TimeSeriesPreviews: PreviewProvider {
         @State var chartState: ChartStateProxy? = nil
         @State var segmentIndex: Int = 0
         
-        let source = InterpolatingTimeSeriesDataSource(data: Self.fullData)
+        let source = SummingTimeSeriesDataSource(data: Self.fullData)
         var body: some View {
             TimeSeriesView(source: source, scope: $currentScope) { timeSeriesData in
                 let chartConfig = LineChartConfig(

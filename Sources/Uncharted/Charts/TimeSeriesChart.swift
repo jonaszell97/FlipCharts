@@ -315,7 +315,7 @@ public struct TimeSeriesView<ChartContent: View>: View {
                     return (i, nil)
                 }
                 
-                return (i, source.averageValue(in: DateInterval(start: currentDate, end: nextDate)))
+                return (i, source.combinedValue(in: DateInterval(start: currentDate, end: nextDate)))
             }
             .filter { $0.1 != nil }
             .map { DataPoint(x: Double($0.0) + xValueOffset, y: $0.1!) }
