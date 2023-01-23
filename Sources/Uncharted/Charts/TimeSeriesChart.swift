@@ -289,17 +289,6 @@ public struct TimeSeriesView<ChartContent: View>: View {
     func getChartData(for resolution: TimeSeriesScope) -> TimeSeriesData {
         let interval = source.interval
         let (dates, valueInterval) = resolution.dates(in: interval)
-        
-        let xValueOffset: Double
-        switch resolution {
-        case .day:
-            fallthrough
-        case .month:
-            xValueOffset = 0
-        default:
-            xValueOffset = 0.5
-        }
-        
         let values = (0..<(dates.count-1))
             .map { (i: Int) -> (Int, Double?) in
                 guard let currentDate = dates[i] else {
@@ -318,10 +307,21 @@ public struct TimeSeriesView<ChartContent: View>: View {
                 return (i, source.combinedValue(in: DateInterval(start: currentDate, end: nextDate)))
             }
             .filter { $0.1 != nil }
-            .map { DataPoint(x: Double($0.0) + xValueOffset, y: $0.1!) }
+            .map { DataPoint(x: Double($0.0), y: $0.1!) }
         
         let configure = { (config: ChartConfig) -> ChartConfig in
             config.xAxisConfig.baseline = .zero
+            
+            if let barChartConfig = config as? BarChartConfig {
+                switch resolution {
+                case .day:
+                    fallthrough
+                case .month:
+                    barChartConfig.centerBars = false
+                default:
+                    barChartConfig.centerBars = true
+                }
+            }
             
             switch resolution {
             case .day:

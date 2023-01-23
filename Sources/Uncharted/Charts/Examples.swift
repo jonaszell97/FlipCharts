@@ -4,6 +4,13 @@
 import SwiftUI
 import Toolbox
 
+internal final class PreviewUtility: ObservableObject {
+    @Published var debugMessage: String? = nil
+    static let shared = PreviewUtility()
+    
+    init() { }
+}
+
 struct BarChartPreviews {
     static let seed: UInt64 = 1234
     internal static func createExampleData() -> ChartData {
@@ -112,16 +119,18 @@ struct TimeSeriesPreviews: PreviewProvider {
         }
         
         static let fullData: [(Date, Double)] = [
-            (date(from: "2023-01-01T00:00:00+0000"), 1),
-            (date(from: "2023-01-02T00:00:00+0000"), 2),
-            (date(from: "2023-01-03T00:00:00+0000"), 3),
-            (date(from: "2023-01-04T00:00:00+0000"), 4),
-            (date(from: "2023-01-05T00:00:00+0000"), 5),
-            (date(from: "2023-01-06T00:00:00+0000"), 6),
-            (date(from: "2023-01-07T00:00:00+0000"), 7),
-            (date(from: "2023-01-08T00:00:00+0000"), 8),
-            (date(from: "2023-01-09T00:00:00+0000"), 9),
-            (date(from: "2023-01-10T00:00:00+0000"), 10),
+            (date(from: "2023-01-01T00:00:01+0000"), 10),
+            (date(from: "2023-01-02T00:01:00+0000"), 6),
+            (date(from: "2023-01-03T00:01:00+0000"), 1),
+            (date(from: "2023-01-04T00:00:00+0000"), 13),
+            (date(from: "2023-01-05T00:01:00+0000"), 5),
+            (date(from: "2023-01-06T00:00:20+0000"), 19),
+            (date(from: "2023-01-13T00:01:00+0000"), 25),
+            (date(from: "2023-01-14T00:00:30+0000"), 1),
+            (date(from: "2023-01-15T00:04:00+0000"), 6),
+            (date(from: "2023-01-20T00:00:00+0000"), 5),
+            (date(from: "2023-01-22T00:50:00+0000"), 3),
+            (date(from: "2023-01-23T00:01:00+0000"), 17),
             (date(from: "2023-03-10T00:00:00+0000"), 15),
             (date(from: "2023-04-10T00:00:00+0000"), 16),
             (date(from: "2023-05-10T00:00:00+0000"), 17),
@@ -133,11 +142,14 @@ struct TimeSeriesPreviews: PreviewProvider {
         @State var selectedDataPoint: DataPoint? = nil
         @State var chartState: ChartStateProxy? = nil
         @State var segmentIndex: Int = 0
+        @ObservedObject var util: PreviewUtility = .shared
         
         let source = SummingTimeSeriesDataSource(data: Self.fullData)
         var body: some View {
             TimeSeriesView(source: source, scope: $currentScope) { timeSeriesData in
-                let chartConfig = LineChartConfig(
+                let chartConfig = BarChartConfig(
+                    maxBarWidth: 35,
+                    centerBars: true,
                     xAxisConfig: .xAxis(step: .automatic(preferredSteps: 4),
                                         scrollingBehaviour: .continuous(visibleValueRange: 10),
                                         gridStyle: .defaultXAxisStyle,
@@ -167,7 +179,10 @@ struct TimeSeriesPreviews: PreviewProvider {
                     HStack {
                         Spacer()
                         
-                        if let selectedDataPoint {
+                        if let debugMessage = util.debugMessage {
+                            Text(verbatim: debugMessage)
+                        }
+                        else if let selectedDataPoint {
                             let label = chartConfig.xAxisConfig.labelFormatter(selectedDataPoint.x)
                             let value = chartConfig.yAxisConfig.labelFormatter(selectedDataPoint.y)
                             let index = Int(selectedDataPoint.x.rounded(.down))
