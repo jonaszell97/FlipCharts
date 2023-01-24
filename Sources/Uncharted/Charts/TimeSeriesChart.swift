@@ -81,7 +81,7 @@ extension TimeSeriesScope {
                 length = .init(hour: 24)
             case .week:
                 offset = .init(day: 7 * segmentIndex)
-                length = .init(day: 7 * segmentIndex)
+                length = .init(day: 7)
             case .month:
                 offset = .init(month: 1 * segmentIndex)
                 length = .init(month: 1)
