@@ -10,6 +10,37 @@ public enum ChartDataAggregationMethod {
     case range
 }
 
+fileprivate func offsetInterval(scope: TimeSeriesScope, interval: DateInterval, segmentIndex: Int) -> DateInterval {
+    let offset: DateComponents
+    let length: DateComponents
+    
+    switch scope {
+    case .day:
+        offset = .init(hour: 24 * segmentIndex)
+        length = .init(hour: 24)
+    case .week:
+        offset = .init(day: 7 * segmentIndex)
+        length = .init(day: 7)
+    case .month:
+        offset = .init(month: 1 * segmentIndex)
+        length = .init(month: 1)
+    case .threeMonths:
+        offset = .init(month: 3 * segmentIndex)
+        length = .init(month: 3)
+    case .sixMonths:
+        offset = .init(month: 6 * segmentIndex)
+        length = .init(month: 6)
+    case .year:
+        offset = .init(year: 1 * segmentIndex)
+        length = .init(year: 1)
+    }
+    
+    let firstDate = Calendar.reference.date(byAdding: offset, to: interval.start)!
+    let lastDate = Calendar.reference.date(byAdding: length, to: firstDate)!
+    
+    return DateInterval(start: firstDate, end: lastDate)
+}
+
 extension TimeSeriesScope {
     /// The date used as a sentinel value to pad months to equal length.
     static let sentinelDate: Date = Date(timeIntervalSinceReferenceDate: Date.distantFuture.timeIntervalSinceReferenceDate - 1)
@@ -70,36 +101,10 @@ extension TimeSeriesScope {
     }
     
     /// - returns: A string representing the selected interval in the given locale.
-    public func formatTimeInterval(_ interval: DateInterval, segmentIndex: Int = 0, locale: Locale? = nil) -> String {
+    public func formatTimeInterval(_ interval: DateInterval, segmentIndex: Int? = nil, locale: Locale? = nil) -> String {
         var interval = interval
-        if segmentIndex > 0 {
-            let offset: DateComponents
-            let length: DateComponents
-            switch self {
-            case .day:
-                offset = .init(hour: 24 * segmentIndex)
-                length = .init(hour: 24)
-            case .week:
-                offset = .init(day: 7 * segmentIndex)
-                length = .init(day: 7)
-            case .month:
-                offset = .init(month: 1 * segmentIndex)
-                length = .init(month: 1)
-            case .threeMonths:
-                offset = .init(month: 3 * segmentIndex)
-                length = .init(month: 3)
-            case .sixMonths:
-                offset = .init(month: 6 * segmentIndex)
-                length = .init(month: 6)
-            case .year:
-                offset = .init(year: 1 * segmentIndex)
-                length = .init(year: 1)
-            }
-            
-            let firstDate = Calendar.reference.date(byAdding: offset, to: interval.start)!
-            let lastDate = Calendar.reference.date(byAdding: length, to: firstDate)!
-            
-            interval = DateInterval(start: firstDate, end: lastDate)
+        if let segmentIndex {
+            interval = offsetInterval(scope: self, interval: interval, segmentIndex: segmentIndex)
         }
         
         switch self {
@@ -257,6 +262,11 @@ public struct TimeSeriesData {
         hasher.combine(values)
         
         self.hashValue = hasher.finalize()
+    }
+    
+    /// - returns: The currently visible date interval based on the selected segment index.
+    public func interval(forSegment segmentIndex: Int) -> DateInterval {
+        offsetInterval(scope: scope, interval: interval, segmentIndex: segmentIndex)
     }
 }
 
