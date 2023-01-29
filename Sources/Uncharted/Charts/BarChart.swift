@@ -162,6 +162,7 @@ fileprivate struct BarChartViewImpl: View {
                 }
                 .contentShape(Rectangle())
                 .onTapGesture {
+                    guard !positiveValues[0].1.isZero else { return }
                     state.runTapActions(for:
                             .init(x: xValue, y: positiveValues[0].1), in: positiveValues[0].0)
                 }
@@ -186,6 +187,7 @@ fileprivate struct BarChartViewImpl: View {
                 }
                 .contentShape(Rectangle())
                 .onTapGesture {
+                    guard !negativeValues[0].1.isZero else { return }
                     state.runTapActions(for:
                             .init(x: xValue, y: negativeValues[0].1), in: negativeValues[0].0)
                 }
@@ -228,6 +230,7 @@ fileprivate struct BarChartViewImpl: View {
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
+                        guard !positiveValues[i].1.isZero else { return }
                         state.runTapActions(for:
                                 .init(x: xValue, y: positiveValues[i].1), in: positiveValues[i].0)
                     }
@@ -256,6 +259,7 @@ fileprivate struct BarChartViewImpl: View {
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
+                        guard !negativeValues[i].1.isZero else { return }
                         state.runTapActions(for:
                                 .init(x: xValue, y: negativeValues[i].1), in: negativeValues[i].0)
                     }
