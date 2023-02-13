@@ -6,7 +6,7 @@
       "location" : "/Users/jonaszell/Panorama",
       "state" : {
         "branch" : "dev",
-        "revision" : "aac21a88d0a4d14e48d7f8f0db607aba08ec1f52"
+        "revision" : "4eba6394b7ce6ccda4a07a932b77b4ce29299512"
       }
     },
     {
@@ -15,7 +15,7 @@
       "location" : "/Users/jonaszell/Toolbox",
       "state" : {
         "branch" : "dev",
-        "revision" : "27f59504e1202b02981ad1585e0c0b6b989b713c"
+        "revision" : "043a82bc5588f76b0de3f606a822e2abf8933b4a"
       }
     }
   ],
