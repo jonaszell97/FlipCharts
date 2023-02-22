@@ -3,7 +3,7 @@
     {
       "identity" : "panorama",
       "kind" : "localSourceControl",
-      "location" : "/Users/jonaszell/Panorama",
+      "location" : "/Users/jonaszell/Developer/Panorama",
       "state" : {
         "branch" : "dev",
         "revision" : "4eba6394b7ce6ccda4a07a932b77b4ce29299512"
@@ -12,7 +12,7 @@
     {
       "identity" : "toolbox",
       "kind" : "localSourceControl",
-      "location" : "/Users/jonaszell/Toolbox",
+      "location" : "/Users/jonaszell/Developer/Toolbox",
       "state" : {
         "branch" : "dev",
         "revision" : "043a82bc5588f76b0de3f606a822e2abf8933b4a"
