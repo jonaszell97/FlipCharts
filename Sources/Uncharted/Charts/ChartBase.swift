@@ -183,8 +183,13 @@ internal struct ChartBase<Content: View>: View {
     /// Build the complete y-axis.
     func yAxis(data: ChartData, yAxisParams: ComputedChartAxisData) -> some View {
         VStack(spacing: 0) {
-            yAxisLabels(data: data, yAxisParams: yAxisParams)
-            xAxisSpacer
+            if state.fullData.config.yAxisConfig.visible {
+                yAxisLabels(data: data, yAxisParams: yAxisParams)
+            }
+            
+            if state.fullData.config.xAxisConfig.visible {
+                xAxisSpacer
+            }
         }
     }
     
@@ -448,9 +453,7 @@ internal struct ChartBase<Content: View>: View {
             .clipShape(Rectangle())
             .contentShape(Rectangle())
             
-            if state.fullData.config.yAxisConfig.visible {
-                self.yAxis(data: state.currentDataSubset, yAxisParams: yAxisParams)
-            }
+            self.yAxis(data: state.currentDataSubset, yAxisParams: yAxisParams)
         }
     }
     
