@@ -37,14 +37,17 @@ internal struct ChartBase<Content: View>: View {
         let axisConfig = data.config.xAxisConfig
         let xAxisParams = data.computedParameters.xAxisParams
         let height = ChartState.xAxisHeight(for: axisConfig)
+        let centerLabels = axisConfig.centerLabels
         
         return GeometryReader { geometry in
             let labelCount = xAxisParams.labels.count == 1 ? 1 : xAxisParams.labels.count - 1
             if labelCount >= 1 {
                 let spacePerLabel = geometry.size.width / CGFloat(labelCount)
+                
                 HStack(spacing: 0) {
                     ForEach(0..<labelCount, id: \.self) { labelIndex in
                         HStack(spacing: 0) {
+                            let spacePerLabelText = spacePerLabel - (labelIndex == 0 ? 2 : 1) * axisConfig.gridStyle.lineWidth
                             if labelIndex == 0 {
                                 LineShape(edge: .leading)
                                     .stroke(axisConfig.gridStyle.lineColor, style: axisConfig.gridStyle.swiftUIStrokeStyle)
@@ -52,17 +55,19 @@ internal struct ChartBase<Content: View>: View {
                             }
                             
                             let label = xAxisParams.labels[labelIndex]
-                            Group {
+                            HStack {
                                 Text(verbatim: label)
                                     .foregroundColor(axisConfig.labelFontColor)
                                     .font(axisConfig.labelFont.monospacedDigit())
-                                    .padding(.leading, 4)
+                                    .padding(.leading, centerLabels ? 0 : 4)
                                     .lineLimit(1)
-                                    .minimumScaleFactor(0.75)
+                                    .minimumScaleFactor(0.50)
+                                
+                                if !centerLabels {
+                                    Spacer()
+                                }
                             }
-                            .frame(height: height)
-                            
-                            Spacer()
+                            .frame(width: spacePerLabelText, height: height)
                             
                             LineShape(edge: .leading)
                                 .stroke(axisConfig.gridStyle.lineColor, style: axisConfig.gridStyle.swiftUIStrokeStyle)

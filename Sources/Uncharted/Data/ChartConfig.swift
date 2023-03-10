@@ -79,6 +79,9 @@ public struct ChartAxisConfig {
     /// The font color of the labels on this axis.
     public var labelFontColor: Color
     
+    /// Whether the labels should be centered.
+    public var centerLabels: Bool
+    
     /// The size of this axis.
     public var size: CGFloat?
     
@@ -100,6 +103,7 @@ public struct ChartAxisConfig {
                  titleFontColor: Color = .primary,
                  labelFont: Font = .caption,
                  labelFontColor: Color = .primary.opacity(0.5),
+                 centerLabels: Bool = false,
                  size: CGFloat? = nil,
                  gridStyle: GridStyle = .defaultXAxisStyle,
                  labelFormatter: DataFormatter = FloatingPointFormatter.standard) {
@@ -114,6 +118,7 @@ public struct ChartAxisConfig {
         self.titleFontColor = titleFontColor
         self.labelFont = labelFont
         self.labelFontColor = labelFontColor
+        self.centerLabels = centerLabels
         self.size = size
         self.gridStyle = gridStyle
         self.labelFormatter = labelFormatter
@@ -163,6 +168,7 @@ public struct ChartAxisConfig {
     ///   - titleFontColor: The font color of the title of this axis.
     ///   - labelFont: The label font of this axis.
     ///   - labelFontColor: The font color of the labels on this axis.
+    ///   - centerLabels: Whether the labels should be horizontally centered.
     ///   - size: The size of this axis.
     ///   - gridStyle:  The grid style of this axis.
     ///   - labelFormatter: The formatter for data labels.
@@ -178,6 +184,7 @@ public struct ChartAxisConfig {
                              titleFontColor: Color = .primary,
                              labelFont: Font = .caption,
                              labelFontColor: Color = .primary.opacity(0.5),
+                             centerLabels: Bool = false,
                              size: CGFloat? = nil,
                              gridStyle: GridStyle = .defaultXAxisStyle,
                              labelFormatter: DataFormatter = FloatingPointFormatter.standard) -> ChartAxisConfig {
@@ -185,7 +192,7 @@ public struct ChartAxisConfig {
                      scrollingBehaviour: scrollingBehaviour,
                      scrollingThresholdTranslation: scrollingThresholdTranslation,
                      titleFont: titleFont, titleFontColor: titleFontColor,
-                     labelFont: labelFont, labelFontColor: labelFontColor,
+                     labelFont: labelFont, labelFontColor: labelFontColor, centerLabels: centerLabels,
                      size: size, gridStyle: gridStyle,
                      labelFormatter: labelFormatter)
     }
@@ -221,7 +228,7 @@ public struct ChartAxisConfig {
         return .init(title: title, visible: visible, baseline: baseline, topline: topline, step: step,
                      scrollingBehaviour: .noScrolling,
                      titleFont: titleFont, titleFontColor: titleFontColor,
-                     labelFont: labelFont, labelFontColor: labelFontColor,
+                     labelFont: labelFont, labelFontColor: labelFontColor, centerLabels: false,
                      size: size, gridStyle: gridStyle,
                      labelFormatter: labelFormatter)
     }
